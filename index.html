@@ -1,9 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لعبة المنطاد الطائر التعليمية</title>
+    <title>المنطاد الطائر</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
 
@@ -15,7 +16,7 @@
             --accent-green: #2B9348;
             --accent-red: #D90429;
             --text-dark: #1D2D44;
-            --white-card: rgba(255, 255, 255, 0.95);
+            --white-card: rgba(255, 255, 255, 0.98);
         }
 
         * {
@@ -45,14 +46,15 @@
             overflow: hidden;
         }
 
-        /* Fixed Top Header */
+        /* Fixed Top Header - High Z-Index to prevent overlapping */
         header {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.9);
+            height: 75px;
+            z-index: 2000;
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(8px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             border-bottom: 4px solid var(--gold);
@@ -64,12 +66,13 @@
         }
 
         header.compact {
+            height: 60px;
             padding: 5px 15px;
         }
 
         .game-title-header {
             font-weight: 900;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: var(--primary-blue);
             display: flex;
             align-items: center;
@@ -86,12 +89,13 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            font-size: 0.95rem;
         }
 
-        /* Safe area reserved below header */
+        /* Safe area reserved below header with strict top margin */
         #game-area {
             position: absolute;
-            top: 70px;
+            top: 75px;
             bottom: 0;
             left: 0;
             right: 0;
@@ -116,7 +120,7 @@
         #start-screen {
             position: absolute;
             inset: 0;
-            z-index: 200;
+            z-index: 3000;
             background: linear-gradient(135deg, #a8dede 0%, #f3f8fb 100%);
             display: flex;
             flex-direction: column;
@@ -141,7 +145,7 @@
         }
 
         .main-title {
-            font-size: 2.5rem;
+            font-size: 2.3rem;
             font-weight: 900;
             color: var(--primary-blue);
             margin-bottom: 5px;
@@ -149,7 +153,7 @@
         }
 
         .welcome-msg {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: #555;
             line-height: 1.5;
@@ -178,7 +182,7 @@
         .btn-start {
             background: linear-gradient(to bottom, #C9A227, #a3821c);
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 900;
             padding: 12px 40px;
             border: none;
@@ -194,11 +198,23 @@
             box-shadow: 0 2px 0 #785e10, 0 5px 10px rgba(0,0,0,0.2);
         }
 
+        /* Hot Air Balloon - Placed BEHIND clouds so clouds are fully clickable and visible on top */
+        #balloon {
+            position: absolute;
+            width: 90px;
+            height: 125px;
+            z-index: 5;
+            transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.2));
+            pointer-events: none;
+        }
+
+        /* Interactive Clouds - Placed ABOVE balloon (z-index 15) so they are never covered by balloon */
         .interactive-cloud {
             position: absolute;
             cursor: pointer;
             transition: transform 0.3s, filter 0.3s;
-            z-index: 10;
+            z-index: 15;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -209,17 +225,17 @@
         }
 
         .cloud-svg {
-            width: 110px;
-            height: 70px;
+            width: 90px;
+            height: 55px;
             filter: drop-shadow(0 6px 8px rgba(0,0,0,0.15));
         }
 
         .cloud-number {
             position: absolute;
             font-weight: 900;
-            font-size: 1.3rem;
+            font-size: 1.15rem;
             color: var(--primary-blue);
-            z-index: 2;
+            z-index: 16;
         }
 
         .interactive-cloud.completed .cloud-svg path {
@@ -230,23 +246,12 @@
             color: #ffffff;
         }
 
-        /* Hot Air Balloon */
-        #balloon {
-            position: absolute;
-            width: 120px;
-            height: 160px;
-            z-index: 20;
-            transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1);
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
-            pointer-events: none;
-        }
-
         .modal-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             backdrop-filter: blur(4px);
-            z-index: 150;
+            z-index: 2500;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -268,12 +273,14 @@
             max-width: 600px;
             width: 100%;
             border: 4px solid var(--gold);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
             transform: translateY(20px);
             transition: transform 0.3s ease;
             display: flex;
             flex-direction: column;
             gap: 15px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-overlay.active .question-card {
@@ -281,7 +288,7 @@
         }
 
         .question-title {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             font-weight: 800;
             color: var(--primary-blue);
             line-height: 1.5;
@@ -302,7 +309,7 @@
             border: 2px solid #e9ecef;
             padding: 12px 18px;
             border-radius: 12px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--text-dark);
             text-align: right;
@@ -326,7 +333,6 @@
             flex-shrink: 0;
         }
 
-        /* Error Shake Animation */
         .question-card.shake {
             animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
             border-color: var(--accent-red);
@@ -352,7 +358,7 @@
         #win-screen {
             position: absolute;
             inset: 0;
-            z-index: 250;
+            z-index: 3000;
             background: linear-gradient(135deg, rgba(214,228,240,0.95) 0%, rgba(255,255,255,0.98) 100%);
             display: flex;
             flex-direction: column;
@@ -385,8 +391,8 @@
         }
 
         .win-icon {
-            width: 80px;
-            height: 80px;
+            width: 65px;
+            height: 65px;
             fill: var(--gold);
             animation: pulse 1.5s infinite alternate;
         }
@@ -415,40 +421,36 @@
         }
 
         .stat-value {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 900;
             color: var(--primary-blue);
         }
 
         .stat-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 700;
             color: #555;
         }
 
-        /* SVG Book Icon for Decoration */
         .icon-svg {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             vertical-align: middle;
         }
     </style>
 </head>
 <body>
-
     <div id="game-container">
         
         <!-- Header -->
         <header id="main-header">
             <div class="game-title-header">
-                <!-- Book Icon -->
                 <svg class="icon-svg" viewBox="0 0 24 24" fill="var(--gold)">
                     <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
                 </svg>
                 <span>المنطاد الطائر</span>
             </div>
             <div class="student-badge" id="header-student-badge" style="display: none;">
-                <!-- Pen Icon -->
                 <svg class="icon-svg" viewBox="0 0 24 24" fill="var(--primary-blue)">
                     <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                 </svg>
@@ -459,9 +461,8 @@
         <!-- Start Screen -->
         <div id="start-screen">
             <div class="start-card">
-                <!-- Book/Gift Hybrid SVG Banner -->
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="var(--gold)">
-                    <path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.11-.9-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4V8h5.08L7 10.83l1.41 1.41L12 8.66l3.59 3.58L17 10.83 14.92 8H20v11z"/>
+                <svg width="70" height="70" viewBox="0 0 24 24" fill="var(--gold)">
+                    <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
                 </svg>
                 <h1 class="main-title">رحلة المنطاد الطائر</h1>
                 <p class="welcome-msg">أهلاً بك يا بطل في رحلة التعلم والتحليق! أدخل اسمك للبدء في صعود السماء وتخطي السحب بالإجابات الصحيحة.</p>
@@ -474,13 +475,11 @@
 
         <!-- Safe Game Playing Area -->
         <div id="game-area">
-            <!-- Background floating clouds generated via JS -->
             <div id="bg-clouds-layer"></div>
 
             <!-- Hot Air Balloon -->
             <div id="balloon">
                 <svg viewBox="0 0 100 130" width="100%" height="100%">
-                    <!-- Balloon Envelope -->
                     <defs>
                         <linearGradient id="balloonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" style="stop-color:#C9A227;stop-opacity:1" />
@@ -489,20 +488,15 @@
                         </linearGradient>
                     </defs>
                     <path d="M 50 0 C 15 0 0 30 0 60 C 0 85 35 100 40 105 L 60 105 C 65 100 100 85 100 60 C 100 30 85 0 50 0 Z" fill="url(#balloonGrad)" />
-                    <!-- Stripes -->
                     <path d="M 50 0 C 30 20 25 70 42 104" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.6"/>
                     <path d="M 50 0 C 70 20 75 70 58 104" fill="none" stroke="#ffffff" stroke-width="2.5" opacity="0.6"/>
-                    <!-- Ropes -->
                     <line x1="42" y1="105" x2="44" y2="116" stroke="#555" stroke-width="1.5"/>
                     <line x1="58" y1="105" x2="56" y2="116" stroke="#555" stroke-width="1.5"/>
-                    <!-- Basket -->
                     <rect x="42" y="116" width="16" height="12" rx="2" fill="#8B4513" />
-                    <!-- Gift Icon Badge on Basket -->
                     <path d="M 47 120 h 6 v 4 h -6 z" fill="#C9A227"/>
                 </svg>
             </div>
 
-            <!-- Interactive Question Clouds Container -->
             <div id="interactive-clouds-layer"></div>
         </div>
 
@@ -518,12 +512,11 @@
         <!-- Win Screen -->
         <div id="win-screen">
             <div class="win-card">
-                <!-- Book / Gift Trophy Icon -->
                 <svg class="win-icon" viewBox="0 0 24 24">
-                    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z M5 13.18v4l7 3.82 7-3.82v-4L12 17l-7-3.82z"/>
+                    <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
                 </svg>
-                <h2 style="font-size: 2rem; font-weight: 900; color: var(--primary-blue);">مبارك الفوز والتفوق!</h2>
-                <p style="font-size: 1.2rem; font-weight: 700; color: #444;" id="win-student-msg">أحسنت يا بطل!</p>
+                <h2 style="font-size: 1.8rem; font-weight: 900; color: var(--primary-blue);">مبارك الفوز والتفوق!</h2>
+                <p style="font-size: 1.1rem; font-weight: 700; color: #444;" id="win-student-msg">أحسنت يا بطل!</p>
                 
                 <div class="stats-grid">
                     <div class="stat-box">
@@ -540,15 +533,13 @@
                     </div>
                 </div>
 
-                <button class="btn-start" onclick="resetGame()" style="margin-top: 15px;">إعادة اللعب</button>
+                <button class="btn-start" onclick="resetGame()" style="margin-top: 10px;">إعادة اللعب</button>
             </div>
         </div>
 
     </div>
 
     <script>
-        
-        // Questions Database
         const questionsData = [
             {
                 q: "عبادة نتعبد بها لله، وهي عبارة عن طلب العون من الله في الوصول إلى مقصودنا:",
@@ -620,19 +611,72 @@
                     "جميع ما سبق."
                 ],
                 correct: 3
+            },
+            {
+                q: "عبادة نتعبد بها لله، وهي عبارة عن طلب العون من الله في الوصول إلى مقصودنا (تكرار للتثبيت):",
+                options: ["الاستعانة", "الاستعاذة"],
+                correct: 0
+            },
+            {
+                q: "في سورة الفاتحة نردد دائماً: (إياك نعبد وإياك نستعين). لماذا جُمِعت العبادة والاستعانة معاً في هذه الآية؟",
+                options: [
+                    "لأن العبادة وحدها تكفي ولا نحتاج للاستعانة.",
+                    "لأننا لا نستطيع أداء العبادة والقيام بطاعة الله إلا بمعونة الله وتوفيقه لنا."
+                ],
+                correct: 1
+            },
+            {
+                q: "ما معنى: (لا حول ولا قوة إلا بالله)؟",
+                options: [
+                    "تعبير عن اليأس والاستسلام للمشاكل.",
+                    "اعتراف بأن التحول من حال إلى حال ومن ضعف إلى قوة لا يكون إلا بالله وحده."
+                ],
+                correct: 1
+            },
+            {
+                q: "نستعين بالله على...",
+                options: [
+                    "فعل الطاعات وترك المنكرات.",
+                    "الصبر على أقدار الله.",
+                    "جميع ما سبق."
+                ],
+                correct: 2
+            },
+            {
+                q: "اقترب امتحان مادة صعبة بالنسبة لك وتشعر بالتوتر والقلق الشديد. ما هو التصرف الذي يدل على الاستعانة الصحيحة بالله في هذه اللحظة؟",
+                options: [
+                    "تذاكر بجد واجتهاد، وتتوكل على الله، وتستعين به بالدعاء.",
+                    "تترك المذاكرة نهائياً وتعتمد على الدعاء فقط.",
+                    "تبكي وتظن أن الله لن يوفقك لأنك خائف."
+                ],
+                correct: 0
+            },
+            {
+                q: "فزت بالمركز الأول في مسابقة القرآن، وبدأ أصدقاؤك يمتدحون ذكاءك وقدراتك العالية؛ فبماذا تفكر من داخلك؟",
+                options: [
+                    "أنا حقاً عبقري، ولا أحد يستطيع الوصول لمثلي.",
+                    "يجب ألا أتحدث مع أحد حتى لا يحسدوني.",
+                    "أحمد الله الذي وفقني، فلولا توفيق الله لي وعونه لما حفظت حرفاً واحداً، وأقول: (وما توفيقي إلا بالله، اللهم ثبتني)."
+                ],
+                correct: 2
+            },
+            {
+                q: "ما هو الأثر الذي تشعر به حين تتعود على الاستعانة بالله في كل تفاصيل حياتك الصغيرة والكبيرة؟",
+                options: [
+                    "الشعور بالثقل وكثرة المسؤوليات.",
+                    "الطمأنينة وراحة البال واليقين بأنك لست وحدك، فالله معك يحميك ويدبر أمرك."
+                ],
+                correct: 1
             }
         ];
 
-        // Game State Variables
         let studentName = "";
         let currentCloudIndex = 0;
         let attemptsCount = 0;
         let correctAnswersCount = 0;
         let startTime = null;
-        let timerInterval = null;
         let audioCtx = null;
 
-        // Initialize Audio Context on user action
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -642,7 +686,6 @@
             }
         }
 
-        // Web Audio Synthesizer Effects
         function playSound(type) {
             if (!audioCtx) return;
             
@@ -653,12 +696,11 @@
             gain.connect(audioCtx.destination);
 
             if (type === 'correct') {
-                // Success Arpeggio
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, now); // C5
-                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-                osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                osc.frequency.setValueAtTime(1046.50, now + 0.3);
 
                 gain.gain.setValueAtTime(0.3, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
@@ -666,7 +708,6 @@
                 osc.start(now);
                 osc.stop(now + 0.6);
             } else if (type === 'wrong') {
-                // Low Warning Tone
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(180, now);
                 osc.frequency.linearRampToValueAtTime(110, now + 0.3);
@@ -677,7 +718,6 @@
                 osc.start(now);
                 osc.stop(now + 0.4);
             } else if (type === 'win') {
-                // Fanfare melody
                 const notes = [523.25, 659.25, 783.99, 1046.50, 880, 1046.50];
                 const times = [0, 0.15, 0.3, 0.45, 0.65, 0.85];
                 const durations = [0.12, 0.12, 0.12, 0.18, 0.18, 0.4];
@@ -700,8 +740,6 @@
             }
         }
 
-
-        // Background animated cloud generation
         function createBackgroundClouds() {
             const container = document.getElementById('bg-clouds-layer');
             container.innerHTML = '';
@@ -723,7 +761,6 @@
             }
         }
 
-        // Layout calculation for Interactive Clouds
         let cloudPositions = [];
 
         function generateCloudLayout() {
@@ -734,32 +771,28 @@
             const total = questionsData.length;
             const area = document.getElementById('game-area');
             const areaWidth = area.clientWidth || window.innerWidth;
-            const areaHeight = area.clientHeight || (window.innerHeight - 70);
+            const areaHeight = area.clientHeight || (window.innerHeight - 75);
 
-            // Responsive padding
-            const paddingX = 70;
-            const startY = areaHeight - 90; 
+            const startY = areaHeight - 70; 
             const endY = 80; 
             const stepY = (startY - endY) / (total - 1);
 
             for (let i = 0; i < total; i++) {
                 const y = startY - (i * stepY);
-                // Alternate left, center, right with smooth variation
                 let xPercent;
-                if (i % 3 === 0) xPercent = 20 + (Math.random() * 15);
+                if (i % 3 === 0) xPercent = 20 + (Math.random() * 12);
                 else if (i % 3 === 1) xPercent = 50 + (Math.random() * 10 - 5);
-                else xPercent = 75 - (Math.random() * 15);
+                else xPercent = 80 - (Math.random() * 12);
 
-                const x = (xPercent / 100) * (areaWidth - paddingX * 2) + paddingX;
+                const x = (xPercent / 100) * (areaWidth - 100) + 50;
 
                 cloudPositions.push({ x, y });
 
-                // Create Cloud Element
                 const cloudEl = document.createElement('div');
                 cloudEl.className = 'interactive-cloud';
                 cloudEl.id = `cloud-${i}`;
-                cloudEl.style.left = `${x - 55}px`;
-                cloudEl.style.top = `${y - 35}px`;
+                cloudEl.style.left = `${x - 45}px`;
+                cloudEl.style.top = `${y - 28}px`;
                 cloudEl.onclick = () => onCloudClick(i);
 
                 cloudEl.innerHTML = `
@@ -772,8 +805,7 @@
                 layer.appendChild(cloudEl);
             }
 
-            // Set initial balloon position below first cloud
-            moveBalloonTo(cloudPositions[0].x, cloudPositions[0].y + 40, false);
+            moveBalloonTo(cloudPositions[0].x, cloudPositions[0].y + 35, false);
         }
 
         function moveBalloonTo(x, y, animate = true) {
@@ -783,11 +815,9 @@
             } else {
                 balloon.style.transition = 'all 1.2s cubic-bezier(0.25, 1, 0.5, 1)';
             }
-            // Center balloon over target position
-            balloon.style.left = `${x - 60}px`;
-            balloon.style.top = `${y - 130}px`;
+            balloon.style.left = `${x - 45}px`;
+            balloon.style.top = `${y - 110}px`;
         }
-
 
         function startGame() {
             const input = document.getElementById('student-name-input');
@@ -806,7 +836,6 @@
 
             document.getElementById('start-screen').style.display = 'none';
 
-            // Reset Game Variables
             currentCloudIndex = 0;
             attemptsCount = 0;
             correctAnswersCount = 0;
@@ -817,7 +846,6 @@
 
         function onCloudClick(index) {
             initAudio();
-            // Only allow clicking current target cloud
             if (index === currentCloudIndex) {
                 openQuestionModal(index);
             }
@@ -853,38 +881,33 @@
             const qCard = document.getElementById('q-card');
 
             if (selectedIdx === correctIdx) {
-                // Correct Answer
                 correctAnswersCount++;
                 playSound('correct');
                 feedback.textContent = "أحسنتِ! إجابة صحيحة 👏";
                 feedback.className = "feedback-msg correct";
 
-                // Mark current cloud as completed
                 document.getElementById(`cloud-${currentCloudIndex}`).classList.add('completed');
 
                 setTimeout(() => {
                     document.getElementById('question-modal').classList.remove('active');
                     
-                    // Move balloon to current cloud
                     const pos = cloudPositions[currentCloudIndex];
                     moveBalloonTo(pos.x, pos.y, true);
 
                     currentCloudIndex++;
 
-                    // Check if reached the top / completed
                     if (currentCloudIndex >= questionsData.length) {
                         setTimeout(showWinScreen, 1500);
                     }
                 }, 800);
 
             } else {
-                // Wrong Answer
                 playSound('wrong');
                 feedback.textContent = "حاول مرة أخرى!";
                 feedback.className = "feedback-msg wrong";
 
                 qCard.classList.remove('shake');
-                void qCard.offsetWidth; // Trigger reflow
+                void qCard.offsetWidth;
                 qCard.classList.add('shake');
             }
         }
@@ -911,11 +934,9 @@
             generateCloudLayout();
         }
 
-        // Window resize handler for layout responsiveness
         window.addEventListener('resize', () => {
             if (document.getElementById('start-screen').style.display === 'none') {
                 generateCloudLayout();
-                // Move balloon back to last reached position
                 const targetIdx = Math.min(currentCloudIndex, cloudPositions.length - 1);
                 if (cloudPositions[targetIdx]) {
                     moveBalloonTo(cloudPositions[targetIdx].x, cloudPositions[targetIdx].y, false);
@@ -923,10 +944,10 @@
             }
         });
 
-        // Initialize background clouds on page load
         window.onload = function() {
             createBackgroundClouds();
         };
     </script>
 </body>
 </html>
+```
